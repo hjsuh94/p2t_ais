@@ -1,2 +1,2 @@
-# pixel_to_torque_ais
+# p2t_ais
 Pixel to torque problems that utilize AIS. 
