@@ -65,10 +65,11 @@ class OnionSim(pyglet.window.Window):
     """
     def create_world(self):
         self.space.gravity = Vec2d(0,0) # planar setting 
-        self.space.damping = 0.01 # quasi-static
+        self.space.damping = 0.0001 # quasi-static. low value is higher damping.
         self.space.iterations = 5 # TODO(terry-suh): re-check. what does this do? 
         self.space.color = pygame.color.THECOLORS["white"]       
         self.add_onions(self.onion_num, self.onion_size)
+        self.wait(1.0) # give some time for colliding pieces to stabilize.
         self.render()
 
     """
@@ -91,8 +92,8 @@ class OnionSim(pyglet.window.Window):
         Create a single onion piece by defining its shape, mass, etc.
         """
         points = self.generate_random_poly((0,0), radius)
-        inertia = pymunk.moment_for_poly(0.1, points, (0, 0))
-        body = pymunk.Body(0.1, inertia)
+        inertia = pymunk.moment_for_poly(100.0, points, (0, 0))
+        body = pymunk.Body(100.0, inertia)
         body.position = Vec2d(random.randint(100, 400), random.randint(100, 400))
         shape = pymunk.Poly(body, points)
         shape.friction = 0.6
@@ -207,12 +208,25 @@ class OnionSim(pyglet.window.Window):
             # length and the goal push length, we will choose to complete this
             # action.            
             if (np.abs(push_length - length) < tolerance):
-                self.remove_bar()
-                self.render()
-                self.update_image()
                 break
 
+        # Wait 1 second in sim time to slow down moving pieces, and render.
+        self.wait(1.0)
+        self.remove_bar()
+        self.render()
+
         return None
+
+    def wait(self, time):
+        """
+        Wait for some time in the simulation. Gives some time to stabilize bodies in collision.
+        """
+        t = 0
+        step_dt = 1/60. 
+        while (t < time):
+            self.space.step(step_dt)
+            t += step_dt
+
 
     """
     2.2 Methods related to rendering
@@ -227,6 +241,7 @@ class OnionSim(pyglet.window.Window):
         self.space.debug_draw(self.draw_options)
         self.dispatch_events() # necessary to refresh somehow....
         self.flip()
+        self.update_image()
 
     """
     2.3 Methods related to image publishing
@@ -249,6 +264,8 @@ class OnionSim(pyglet.window.Window):
     def refresh(self):
         self.remove_onions()
         self.add_onions(self.onion_num, self.onion_size)
+        self.wait(1.0) # Give some time for collision pieces to stabilize.
+        self.render()
 
     def change_onion_num(self, onion_num):
         self.onion_num = onion_num 
