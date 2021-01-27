@@ -44,7 +44,6 @@ class RewardMLP(nn.Module):
             nn.Linear(200, 1)
         )
 
-
     def forward(self, x):
         return self.reward_mlp(x)
 
@@ -56,7 +55,7 @@ class DynamicsMLP(nn.Module):
     2.1 Implements an arbitrary MLP for the dynamics function 
     """
     def __init__(self, z, a):
-        super(DynamicSMLP, self).__init__()
+        super(DynamicsMLP, self).__init__()
 
         # Implements a 3 layer MLP for dynamics.
         self.dynamics_mlp == nn.Sequential(
@@ -90,7 +89,7 @@ class DynamicsLinear(nn.Module):
 """
 class CompressionMLP(nn.Module):
     """
-    3.1 Implements a compression function y -> z.
+    3.1 Implements a compression function I -> z.
     Note that this is a rather huge model because of the matrix size (though not unreasonably huge).
     """
     def __init__(self, z, a):
@@ -108,6 +107,9 @@ class CompressionMLP(nn.Module):
         )
 
     def forward(self, x):
+        # Input is B x 1 x 32 x 32 image.
+        b = x.shape[0]
+        x = x.view(b, 1024)
         return self.compression_mlp(x)
 
 class CompressionLinear(nn.Module):
@@ -121,6 +123,9 @@ class CompressionLinear(nn.Module):
         self.L = nn.Linear(1024, z)
 
     def forward(self, x):
+        # Input is B x 1 x 32 x 32 image.
+        b = x.shape[0]
+        x = x.view(b, 1024)
         return self.L(x)
 
 class CompressionConv(nn.Module):
@@ -152,8 +157,7 @@ class CompressionConv(nn.Module):
         )
 
     def forward(self, x):
-        # TODO(terry-suh): should these models take image as input, or the vectorized image? 
-        # currently assume that it is a vector everywhere except here, wehre it is an image.
+        # input is B x 1 x 32 x 32 image.
         b = x.shape[0] # this is the batch size.
         x = self.compression_conv(x)
         x = x.view(b, 64 * 8 * 8)
@@ -180,5 +184,3 @@ class AbstractionMLP(nn.Module):
 
     def forward(self, x):
         return self.abstraction_mlp(x)
-
-    
