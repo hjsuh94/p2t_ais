@@ -58,7 +58,7 @@ class DynamicsMLP(nn.Module):
         super(DynamicsMLP, self).__init__()
 
         # Implements a 3 layer MLP for dynamics.
-        self.dynamics_mlp == nn.Sequential(
+        self.dynamics_mlp = nn.Sequential(
             nn.Linear(z + a, 200),
             nn.ReLU(),
             nn.Linear(200, 200),

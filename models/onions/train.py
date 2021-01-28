@@ -39,6 +39,8 @@ batch_size = 64
 initial_lr = 1e-3
 
 onion_dataset = OnionDataset("data.csv", "images", "/home/hsuh/Documents/p2t_ais/data/onions")
+dataloader = DataLoader(onion_dataset, batch_size=batch_size, \
+    shuffle=True, num_workers=24)
 
 """
 2. Model Declaration
@@ -52,10 +54,26 @@ compression = models.CompressionMLP(z,a)
 model_lst = [reward, dynamics, compression]
 param_lst = []
 
-for model in model_lst:
-    model.to(cuda_device) # send them to GPU.
-    param_lst += list(model.parameters()) # Collect all parameters.    
-    # TODO(terry-suh): add the option to load paramters from previous training.
+model_dir = "/home/hsuh/Documents/p2t_ais/models/onions/weights"
+model_name_lst = [
+    "reward_mlp.pth",
+    "dynamics_mlp.pth",
+    "compression_mlp.pth"
+]
+
+for i in range(len(model_lst)):
+    model = model_lst[i]
+    model_name = model_name_lst[i]
+
+    model.to(cuda_device) # send model to GPU
+    param_lst += list(model.parameters()) # collect all parameters
+    # NOTE(terry-suh): load parameters from previous training based on model_name_lst
+    try:
+        model.load_state_dict(torch.load(os.path.join(model_dir, model_name)))
+    except FileNotFoundError:
+        print("Model " + model_name + " not found.")
+        pass
+    model.eval()
 
 
 """
@@ -65,9 +83,29 @@ optimizer = torch.optim.Adam(param_lst, lr=initial_lr, weight_decay=1e-5)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=20)
 
 """
-4. Loss function
+4. Loss function. Includes Lyapunov function implementation.
 """
 loss = nn.MSELoss(reduction='sum')
+
+def lyapunov_measure():
+    """
+    Return lyapunov measure by creating a weighted matrix.
+    """
+    pixel_radius = 7
+    measure = np.zeros((32, 32))
+    for i in range(32):
+        for j in range(32):
+            radius = np.linalg.norm(np.array([i - 15.5, j - 15.5]), ord=2)
+            measure[i,j] = np.maximum(radius - pixel_radius, 0)
+    return measure
+
+def lyapunov(image):
+    """
+    Apply the lyapunov measure to the image. Expects (B x 1 x 32 x 32), output B vector.
+    """
+    V_measure = torch.Tensor(lyapunov_measure()).to(cuda_device)
+    return torch.sum(torch.mul(image, V_measure), [2,3])
+
 
 """
 5. Training
@@ -103,6 +141,7 @@ for epoch in range(num_epochs):
         z_loss = loss(zhat_f, z_f)
 
         # Compute loss in reward-space.
+        rtrue = lyapunov(image_f) - lyapunov(image_i)
         r_loss = loss(rhat, rtrue)
 
         # Total loss, backprop, and SGD.
@@ -113,7 +152,7 @@ for epoch in range(num_epochs):
         total_loss.backward()
         optimizer.step()
 
-    print('epoch[{}/{}], loss:{:.4f}'.format(epoch+1, num_epochs, train_loss.item()))
+    print('epoch[{}/{}], loss:{:.4f}'.format(epoch+1, num_epochs, total_loss.item()))
     for param_group in optimizer.param_groups:
         print(param_group['lr'])
 
@@ -122,5 +161,10 @@ for epoch in range(num_epochs):
 
     if (total_loss < best_loss):
         # TODO(terry-suh): save weights
-        best_loss = train_loss
+        for i in range(len(model_lst)):
+            model = model_lst[i]
+            model_name = model_name_lst[i]
+            torch.save(model.state_dict(), os.path.join(model_dir, model_name))
+
+        best_loss = total_loss
         print("Model Saved!")
