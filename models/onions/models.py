@@ -117,7 +117,7 @@ class CompressionLinear(nn.Module):
     3.2 Implements a linear compression function y->z.
     """
     def __init__(self, z, a):
-        super(CompressionMLP, self).__init__()
+        super(CompressionLinear, self).__init__()
 
         # named L since z = Ly in linear control.
         self.L = nn.Linear(1024, z)

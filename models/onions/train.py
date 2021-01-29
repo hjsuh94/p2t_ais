@@ -24,7 +24,7 @@ import warnings
 """
 0. Minor pre-settings for training.
 """
-writer = SummaryWriter("runs/onion_net")
+writer = SummaryWriter("runs/onion_net_lindyn")
 warnings.filterwarnings("ignore")
 torch.multiprocessing.set_sharing_strategy('file_system')
 
@@ -48,17 +48,19 @@ dataloader = DataLoader(onion_dataset, batch_size=batch_size, \
 z = 100 # latent vector dimension
 a = 4   # action space dimension
 reward = models.RewardMLP(z, a)
-dynamics = models.DynamicsMLP(z, a)
+#dynamics = models.DynamicsMLP(z, a)
+dynamics = models.DynamicsLinear(z, a)
 compression = models.CompressionMLP(z,a)
+#compression = models.CompressionLinear(z,a)
 
 model_lst = [reward, dynamics, compression]
 param_lst = []
 
 model_dir = "/home/hsuh/Documents/p2t_ais/models/onions/weights"
 model_name_lst = [
-    "reward_mlp.pth",
-    "dynamics_mlp.pth",
-    "compression_mlp.pth"
+    "reward_mlp_lindyn.pth",
+    "dynamics_mlp_lindyn.pth",
+    "compression_lindyn.pth"
 ]
 
 for i in range(len(model_lst)):
