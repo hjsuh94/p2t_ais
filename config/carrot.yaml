@@ -1,0 +1,59 @@
+# Absolute path for the package. Useful for referencing data directories. 
+path: "/home/hsuh/Documents/p2t_ais"
+
+# Choice of train / deploy / reinforce.
+mode: "train"
+
+# Environment to choose 
+env: "carrot"
+env_name: "Carrot-v0"
+
+# Model settings.
+model:
+  z: 100 
+  a : 4 
+  reward: "RewardMLP"
+  dynamics: "DynamicsMLP"
+  compression: "CompressionMLP"
+
+# Model names being loaded for training and evaluation.
+load_model:
+  model_dir: "models/carrot/weights"
+  compression: "compression_mlp_L05.pth"
+  dynamics:    "dynamics_mlp_L05.pth"
+  reward:      "reward_mlp_L05.pth"
+
+# Model names being saved for training.
+save_model:
+  model_dir: "models/carrot/weights"
+  compression: "compression_mlp_L05.pth"
+  dynamics:    "dynamics_mlp_L05.pth"
+  reward:      "reward_mlp_L05.pth"
+
+# Tensorboard directory name for the run.
+tensorboard_dir: "offline_training_L05"
+log_dir: "offline_trainig_L05"
+
+# Offline Training Parameters.
+offline_train:
+  num_epochs: 4000
+  batch_size: 128
+  initial_lr: 0.001
+  lr_scheduler: "ReduceLROnPlateau"
+  lr_step_size: 1000
+  lmbda: 0.8
+
+# Online Training Parameters.
+online_train:
+  num_epochs: 30
+  batch_size: 24 
+  initial_lr: 0.001
+
+# Dataset parameters 
+dataset:
+  file: "data.csv"
+  image_dir: "images"
+  data_dir: "data/carrot"
+  policy: "random"
+  num_episodes: 1000
+  episode_length: 30

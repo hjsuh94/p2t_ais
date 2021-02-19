@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch 
 import torch.nn.functional as F 
 import numpy as np 
+import os
 
 """
 Models used for the AIS model in the onion problem. In the most general form,
@@ -47,6 +48,20 @@ class RewardMLP(nn.Module):
     def forward(self, x):
         return self.reward_mlp(x)
 
+class RewardLinearNoAction(nn.Module):
+    """
+    1.2 Implements linear reward.
+    """
+    def __init__(self, z, a):
+        super(RewardLinearNoAction, self).__init__()
+
+        self.num_z = z
+        self.R = nn.Linear(z, 1, bias=False)
+
+    def forward(self, x):
+        return self.R(x[:,0:self.num_z])
+
+
 """
 2. Dynamics Function
 """
@@ -83,6 +98,19 @@ class DynamicsLinear(nn.Module):
 
     def forward(self, x):
         return self.AB(x)
+
+class DynamicsLinearNoAction(nn.Module):
+    """
+    2.3 Implements linear dynamics with no action.
+    """
+    def __init__(self, z, a):
+        super(DynamicsLinearNoAction, self).__init__()
+
+        self.A = nn.Linear(z, z, bias=False)
+        self.num_z = z
+
+    def forward(self, x):
+        return self.A(x[:,0:self.num_z])
 
 """
 3. Compression Function
@@ -163,6 +191,20 @@ class CompressionConv(nn.Module):
         x = x.view(b, 64 * 8 * 8)
         x = self.compression_conv_mlp(x)
         return x 
+
+class CompressionLinearNoBias(nn.Module):
+    """
+    3.4 Linear with no bias
+    """
+    def __init__(self, z, a):
+        super(CompressionLinearNoBias, self).__init__()
+
+        self.L = nn.Linear(1024, z, bias=False)
+
+    def forward(self, x):
+        b = x.shape[0]
+        x = x.view(b, 1024)
+        return self.L(x)        
 
 """
 4. Action abstraction function
