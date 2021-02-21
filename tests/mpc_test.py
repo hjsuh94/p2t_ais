@@ -74,4 +74,3 @@ plt.show()
 plt.figure()
 plt.plot(result["input_traj"])
 plt.show()
-

@@ -66,16 +66,3 @@ def OCO_MPC(obs, models, horizon, action_lb, action_ub, rate=1e-2, iterations=10
     }
 
     return result
-
-
-
-
-
-
-
-
-
-
-
-
-
