@@ -18,21 +18,21 @@ model:
 
 # Model names being loaded for training and evaluation.
 load_model:
-  model_dir: "models/carrot/weights/no_action_linear"
+  model_dir: "models/carrot/weights/no_action_linear_auto"
   compression: "compression.pth"
   dynamics:    "dynamics.pth"
   reward:      "reward.pth"
 
 # Model names being saved for training.
 save_model:
-  model_dir: "models/carrot/weights/no_action_linear"
+  model_dir: "models/carrot/weights/no_action_linear_auto"
   compression: "compression.pth"
   dynamics:    "dynamics.pth"
   reward:      "reward.pth"
 
 # Tensorboard directory name for the run.
-tensorboard_dir: "no_action_L0001"
-log_dir: "no_action_L0001"
+tensorboard_dir: "no_action_Lauto"
+log_dir: "no_action_Lauto"
 
 # Offline Training Parameters.
 offline_train:
@@ -41,7 +41,7 @@ offline_train:
   initial_lr: 0.001
   lr_scheduler: "StepLR"
   lr_step_size: 250
-  lmbda: 0.001
+  lmbda: 0.1
 
 # Online Training Parameters.
 online_train:

@@ -1,0 +1,62 @@
+# Absolute path for the package. Useful for referencing data directories. 
+path: "/home/hsuh/Documents/p2t_ais"
+
+# Choice of train / deploy / reinforce.
+mode: "train"
+
+# Environment to choose 
+env: single_integrator
+env_name: "SingleIntegrator-v0"
+
+# Model settings.
+model:
+  z: 10
+  a : 2 
+  reward: "RewardMLP"
+  dynamics: "DynamicsMLP"
+  compression: "CompressionConv"
+
+# Model names being loaded for training and evaluation.
+load_model:
+  model_dir:   "models/single_integrator/weights/z2_mlp_conv_e2c"
+  compression:   "compression.pth"
+  dynamics:      "dynamics.pth"
+  reward:        "reward.pth"
+  decompression: "decompression.pth"
+
+# Model names being saved for training.
+save_model:
+  model_dir:   "models/single_integrator/weights/z2_mlp_conv_e2c"
+  compression:   "compression.pth"
+  dynamics:      "dynamics.pth"
+  reward:        "reward.pth"
+  decompression: "decompression.pth"
+
+
+# Tensorboard directory name for the run.
+tensorboard_dir: "z2_lambda1_reduce_12"
+log_dir: "z2_lambda1_8.csv"
+
+# Offline Training Parameters.
+offline_train:
+  num_epochs: 1000
+  batch_size: 256
+  initial_lr: 0.001
+  lr_scheduler: "StepLR"
+  lr_step_size: 250
+  lmbda: 0.5 # Make sure this lies between 0 and 1.
+
+# Online Training Parameters.
+online_train:
+  num_epochs: 30
+  batch_size: 64 
+  initial_lr: 1e-3
+
+# Dataset parameters 
+dataset:
+  file: "data.csv"
+  image_dir: "images"
+  data_dir: "data/single_integrator"
+  policy: "random"
+  num_episodes: 1000
+  episode_length: 200

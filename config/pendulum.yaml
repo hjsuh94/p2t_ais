@@ -36,7 +36,7 @@ log_dir: "online_rl2.csv"
 offline_train:
   num_epochs: 100 
   batch_size: 64 
-  iniital_lr: 1e-3
+  iniital_lr: 0.0001
   lr_scheduler: "StepLR"
   lr_step_size: 250
   lmbda: 0.01

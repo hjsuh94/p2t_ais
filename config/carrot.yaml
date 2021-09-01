@@ -12,13 +12,14 @@ env_name: "Carrot-v0"
 model:
   z: 100 
   a : 4 
-  reward: "RewardMLP"
-  dynamics: "DynamicsMLP"
+  reward: "RewardLinearNoAction"
+  dynamics: "DynamicsLinear"
   compression: "CompressionMLP"
+  decompression: "DeCompressionMLP"
 
 # Model names being loaded for training and evaluation.
 load_model:
-  model_dir: "models/carrot/weights"
+  model_dir: "models/carrot/weights/L"
   compression: "compression_mlp_L05.pth"
   dynamics:    "dynamics_mlp_L05.pth"
   reward:      "reward_mlp_L05.pth"

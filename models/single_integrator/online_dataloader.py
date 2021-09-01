@@ -11,12 +11,13 @@ from PIL import Image
 import warnings 
 warnings.filterwarnings("ignore")
 
-class OnlineDataset(Dataset):
+class ReplayDataset(Dataset):
     """
     Torch dataset class for accessing onion dataset
     """
     def __init__(self, SARSlist):
         self.SARSlist = SARSlist
+
 
     def __len__(self):
         return len(self.SARSlist)
@@ -36,9 +37,9 @@ class OnlineDataset(Dataset):
 
         image_i = image_transform(Image.fromarray(SARS[0]))
         image_f = image_transform(Image.fromarray(SARS[3]))
-        u = np.array(SARS[1])
-        r = np.array([SARS[2]])
-
+        u = SARS[1]
+        r = SARS[2]
+        
         sample = {'image_i': image_i, 'image_f': image_f, 'u': u, 'r': r}
 
         return sample

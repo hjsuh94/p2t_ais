@@ -1,0 +1,90 @@
+# Absolute path for the package. Useful for referencing data directories. 
+path: "/home/hsuh/Documents/p2t_ais"
+
+# Choice of train / deploy / reinforce.
+mode: "evaluate"
+device: "cuda:0"
+
+# Environment to choose 
+env: "carrot"
+env_name: "Carrot-v0"
+
+# Model settings.
+model:
+  z: 20
+  a : 4 
+  num_models: 1
+  reward: "RewardMLP"
+  dynamics: "DynamicsMLP"
+  compression: "CompressionMLP"
+  #decompression: "DeCompressionMLP"
+
+# Model names being loaded for training and evaluation.
+load_model:
+  model_dir: "models/carrot/weights/z20_mlp_lambda1"
+  compression:   "compression.pth"
+  dynamics:      "dynamics.pth"
+  reward:        "reward.pth"
+  #decompression: "decompression.pth"  
+
+# Model names being saved for training.
+save_model:
+  model_dir: "models/carrot/weights/z20_mlp_lambda1"
+  compression:   "compression.pth"
+  dynamics:      "dynamics.pth"
+  reward:        "reward.pth"
+  #decompression: "decompression.pth"    
+
+# Tensorboard directory name for the run.
+tensorboard_dir: "z20_mlp_lambda1_combined"
+log_dir: "offline_trainig_L05"
+
+# Offline Training Parameters.
+offline_train:
+  num_epochs: 1000
+  batch_size: 256
+  initial_lr: 0.001
+  lr_scheduler: "StepLR"
+  lr_step_size: 250
+  lmbda: 0.001
+  mode: "equation"
+
+# Evaluate dataset
+evaluate:
+  log_dir: "models/carrot/eval/z20_mlp_lambda1_samplingmpc"
+  horizon: 3
+  num_episodes: 50
+  episode_length: 20
+  policy: "sampling_mpc"
+  discount: 1.0
+  num_candidates: 1000
+
+# Online Training Parameters.
+online_train:
+  log_dir: "models/carrot/online_rl/z20_mlp_lambda1_ensemble_samplingmpc"
+  num_episodes: 3000
+  episode_length: 20
+  training_frequency: 5000
+  num_epochs: 500
+  batch_size: 256
+  initial_lr: 0.001
+  lr_scheduler: "StepLR"
+  lr_step_size: 300
+  lmbda: 0.001
+  buffer_size: 5000
+  mode: "equation"
+  policy: "sampling_mpc"
+  policy_horizon: 3
+  policy_num_candidates: 1000
+  policy_discount: 0.8
+
+# Dataset parameters 
+dataset:
+  file: "data.csv"
+  image_dir: "images"
+  data_dir: "data/carrot_clf"
+  policy: "sampling_clf"
+  num_episodes: 5000
+  episode_length: 30
+  horizon: 4
+
